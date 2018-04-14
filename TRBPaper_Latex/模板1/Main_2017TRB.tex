@@ -1,0 +1,307 @@
+%
+% Transportation Research Board conference paper template
+% version 2.1.1
+% 
+% David R. Pritchard, http://davidpritchard.org
+%   1.0   - Mar. 2009
+%   1.1   - Sep. 2011, fixes for captions
+%   2.0   - Mar. 2012, Reorganized title page incl. automatic counters
+%   2.1   - Jul. 2015, Automatic total word counter and more formattings
+%   2.1.1 - Jan. 2016, Minor modifications and first uploaded to Github
+%   2.1.1 - May. 2016, created a lite version for people to use directly on TeX without Sweave options
+
+% PAGE LAYOUT
+%------------------------------------------
+
+% Custom paper settings...
+\documentclass[titlepage,oneside,letterpage,12pt]{article}
+
+\oddsidemargin 0.0in
+\topmargin -0.5in
+\headheight 0.3in
+\headsep 0.2in
+\textwidth 6.5in
+\textheight 9.0in
+\setlength{\parindent}{0.5in}
+
+% PAGE HEADER
+%------------------------------------------
+% Adjust the header text below (INSERT AUTHORS HERE)
+\oddsidemargin 0.0in
+\usepackage[tiny,rm]{titlesec}
+\newpagestyle{trbstyle}{
+\sethead{Yan}{}{\thepage}% Change to the last names of the authors, use et al. if 4+ authors
+}
+\pagestyle{trbstyle}
+
+% HEADINGS
+%------------------------------------------
+% Line spacing: 12pt before section titles
+\renewcommand*{\refname}{\uppercase{References}}
+\titleformat{\section}{\bfseries}{}{0pt}{\uppercase}
+\titlespacing*{\section}{0pt}{12pt}{*0}
+\titleformat{\subsection}{\bfseries}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{12pt}{*0}
+\titleformat{\subsubsection}{\itshape}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{*0}
+
+% LISTS
+%------------------------------------------
+% Adjust lists a little. Not quite perfectly fitting TRB style, but vaguely
+% close at least.
+\usepackage{enumitem}
+\setlist[1]{labelindent=0.5in,leftmargin=*}
+\setlist[2]{labelindent=0in,leftmargin=*}
+\setlist{nosep} % eliminate extra verticle spacings between items
+
+% CAPTIONS
+%------------------------------------------
+% Get the captions right. Authors must still be careful to use "Title Case"
+% for table captions, and "Sentence case." for figure captions.
+\usepackage{ccaption}
+\usepackage{amsmath}
+\makeatletter
+\renewcommand{\fnum@figure}{\textbf{FIGURE~\thefigure} }
+\renewcommand{\fnum@table}{\textbf{TABLE~\thetable} }
+\makeatother
+\captiontitlefont{\bfseries \boldmath}
+\captiondelim{\;}
+%\precaption{\boldmath}
+%\newcommand{\reffig}[1]{Figure \ref{#1}}
+
+% FONTS
+%------------------------------------------
+% Times for text and math
+\usepackage{mathptmx}
+
+% Some pdf conversion tricks? Unsure.
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+% Fonts will be broken by Sweave without this option
+%\usepackage[noae]{Sweave}
+
+
+% CITATIONS
+%------------------------------------------
+% TRB uses an Author (num) citation style. I haven't found a way to make
+% LaTeX/Bibtex do this automatically using the standard \cite macro, but
+% this modified \trbcite macro does the trick.
+
+% TODO: sort&compress option?
+\usepackage[sort&compress,numbers]{natbib}
+\renewcommand{\cite}[1]{({\it \citenum{#1}})}
+\newcommand{\trbcite}[1]{\citeauthor{#1} ({\it \citenum{#1}})}
+\setcitestyle{round}
+
+% Reduce spacing between bibliographic items
+\setlength{\bibsep}{0pt plus 0.3ex}
+
+
+% LINE NUMBERING
+%------------------------------------------
+% TRB likes line numbers on drafts to help reviewers refer to parts of the
+% document. Comment out for final versions.
+
+% Use this for draft submissions - line numbering... sort of.
+%\usepackage{parano}
+%\renewcommand\theparano{\textbf{\scriptsize [\arabic{parano}]}}
+% Use this for final submissions - no line numbering
+\newcommand{\parano}{}
+
+% Add line numbers
+\usepackage[pagewise]{lineno}
+  \renewcommand\linenumberfont{\normalfont\small}
+
+
+% COUNTERS
+%------------------------------------------
+% TRB requires the total number of words, figures, and tables to be displayed on
+% the title page. This is possible under the totcount and the xparse packages on CTAN.
+%
+% Note that a total word count is added in V 2.1 to print a single value that is 
+% calculated as: numberofwords + numberoffigures*250 + numberoftable*250
+
+\newread\somefile
+\usepackage{xparse}
+
+% Total world count solution from Tex.SX: http://tex.stackexchange.com/questions/255940/print-a-total-word-count-that-sums-up-the-number-of-words-tables-and-figures
+\newcounter{totalwordcounter}
+\newcounter{wordcounter}
+\makeatletter
+
+\NewDocumentCommand{\wordcount}{s}{%
+  \immediate\write18{texcount -sum -1 \jobname.tex > count.txt}%
+  \immediate\openin\somefile=count.txt%
+  \read\somefile to \@@localdummy%
+  \immediate\closein\somefile%
+  \setcounter{wordcounter}{\@@localdummy}%
+  \IfBooleanF{#1}{%
+  \@@localdummy%   print only if not starred version
+  }%
+}
+\makeatother
+
+\usepackage{totcount}
+	\regtotcounter{table} 	%count tables
+	\regtotcounter{figure} 	%count figures
+
+\newcommand{\wordfigure}{250} % number of words per figure
+\newcommand{\wordtable}{250} % number of words per table
+
+\newcommand{\totalwordcount}{%
+  \wordcount*% The star allows just getting the number, not printing it
+  \setcounter{totalwordcounter}{\value{wordcounter}}%
+  \addtocounter{totalwordcounter}{\numexpr\wordfigure*\totvalue{figure}}%
+  \addtocounter{totalwordcounter}{\numexpr\wordtable*\totvalue{table}} % 
+  \number\value{totalwordcounter}% Output the number
+  \renewcommand{\totalwordcount}{\number\value{totalwordcounter}}% Prevent the call again, otherwise the figure/table counter would be added again. 
+}
+
+% OTHER PACKAGES
+%------------------------------------------
+% Add any additional \usepackage declarations here.
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{setspace}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{longtable}
+\usepackage{amssymb}
+\usepackage{amsmath,amsthm}
+\graphicspath{{figures/}}
+\usepackage{color}\newcommand{\comment}[1]{\textcolor[rgb]{1,0,0}{#1}}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+%\renewcommand\arraystretch{1.3}
+% TITLEPAGE
+%-----------------------------------------
+%\usepackage{Sweave}
+\begin{document}
+%\input{trb_template-concordance}
+%\input{trb_template-concordance}
+%\input{trb_template-concordance}
+	
+\thispagestyle{empty}
+
+\pagewiselinenumbers % comment out for final manuscript; comment out if no line numbers on title page
+
+\begin{titlepage}
+\begin{flushleft}
+% Title
+{\MakeUppercase{\bfseries Passenger oriented timetable optimization considering time-dependent demand}}\\[36pt]
+
+{\bfseries Fei Yan} \\
+PhD Researcher\\
+Department of Transport and Planning\\
+Faculty of Civil Engineering and Geosciences\\
+Stevinweg 1, 2628 CN Delft, The Netherlands\\
+Phone: +31 (15) 27 84914\\
+E-mail:{f.yan@tudelft.nl} \\[12pt]
+
+{\bfseries Rob M.P.Goverde}\\
+Associate Professor\\
+Department of Transport and Planning\\
+Faculty of Civil Engineering and Geosciences\\
+Stevinweg 1, 2628 CN Delft, The Netherlands\\
+Phone: +31 (15) 27 83178\\
+E-mail:{r.m.p.goverde@tudelft.nl} \\[12pt]
+
+%% \totalcount (need to have Perl interpreter [e.g. ActivePerl] and enable shell escape in pdfLaTeX, see some examples below)
+%http://www.activestate.com/activeperl/downloads
+%http://stackoverflow.com/questions/3252957/how-to-execute-shell-script-from-latex
+%http://tex.stackexchange.com/questions/233511/inkscape-and-shell-escape-with-texstudio
+%Word Count: \wordcount words + \total{figure} figure(s) + \total{table} table(s) = \totalwordcount~words\\[12pt] 
+%Command out the above line and manually fill in counts using the line below if you could not get the autocount work.
+Word Count: xxxx words + \total{figure} figure(s) + \total{table} table(s) = xxxx~words \comment{No more than 7500}\\[12pt]
+
+Submission Date: \today
+\end{flushleft}
+\end{titlepage}
+
+%\pagewiselinenumbers % comment out for final manuscript
+
+\newpage
+\section{Abstract}
+%% ***   Put your Abstract here.   ***
+(At most 250 words.)
+
+%\textit{Keywords}:Time-dependent, timetable optimization, PESP,
+
+\newpage
+\section{Introduction}
+Motivation\\
+Literature review\\
+framework
+% Citations: The \trbcite{TRBGuide} has unique and somewhat 
+
+\section{Problem description}
+(use Newell graph)
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{Event_Activity_graph.pdf}
+	\caption{EAN graph}
+	\label{fig:1}
+\end{figure}
+
+\newpage
+\section{Model formulation}
+Cycle time is $T$.\\ 
+Line set is $L$.\\ 
+Train set is $\varGamma$\\
+$E_{odt}$ is the set of $(o,d,t)$. $(o,d,t)$ represents a arriving event with passenger from station $o$ to $d$ at time $t$. \\
+$E$ is the set of all event of train lines, including arrival event $E_{arr}$, departure events $E_{dep}$, through events $E_{thr}$.\\
+$A$ is all activities of train lines, $a \in A$.\\
+$A_{wait}$ stands for the set of activities from passenger arrival event to train departure event.\\
+$\phi_i^a$ is an binary parameter. It represents whether a train with process $a$ could be an alternative choice for passengers at event $i$. It equals one if includes, otherwise zero.
+
+\begin{equation}\label{eq2}
+\mathrm{Minimize} \sum_{ i\in E_{odt}} \sum_{\tau \in \varGamma} q_i\cdot y_i^{\tau} \cdot (\pi_j-\pi_i+p_{ij}\cdot T)
+\end{equation}
+Subject to
+\begin{align}
+& l_{ij}\leq \pi_j-\pi_i+ p_{ij}\cdot T \leq u_{ij} && \forall (i,j) \in A \label{eq3}\\
+& 0\leq \pi_i < T && \forall i \in E \cup E_{odt} \label{eq4}\\
+& \pi_i\leq \pi_j+p_{ij}\cdot T+M\cdot(1-y_i^\tau) &&\forall i \in E_{odt}, j \in E_{dep}\\
+& \sum_{\tau \in \varGamma} y_i^{\tau}=1 && \forall i \in E_{odt}\\
+& \sum_{a\in A} \sum_{i\in E_{odt}} q_i \cdot y_i^{\tau} \cdot \phi_i^a \leq C && \forall \tau \in \varGamma\\
+& p_{ij} \in \{0,1\}&& \forall (i,j) \in A \cup A_{wait} \label{eq5}\\
+&y_i^{\tau} \in \{0,1\}&& \forall i \in E_{odt}, \tau \in \varGamma \label{eq5}
+\end{align}
+Simplification:\\
+For line $l$ does not have stops on both station $o$ and $d$, the corresponding train $\tau$ will have $y_i^{\tau}=0$.\\
+Objective function Linearization:
+\begin{equation}\label{eq2}
+\mathrm{Minimize} \sum_{ i\in E_{odt}} \sum_{\tau \in \varGamma} q_i\cdot z_i^{\tau}
+\end{equation}
+Where
+\begin{align}
+&z_i^{\tau}= y_i^{\tau} \cdot(\pi_j-\pi_i+p_{ij}\cdot T) && \forall i \in E_{odt}, j \in E_{dep}, \tau \in \varGamma
+\end{align}
+and following constraints are designed to make the linear inequality have the same effect as the upper equation.
+
+\begin{align}
+&z_i^{\tau}+M \cdot (1-y_i^{\tau})\geq (\pi_j-\pi_i+p_{ij}\cdot T) && \forall i \in E_{odt}, j \in E_{dep}, \tau \in \varGamma\\
+&z_i^{\tau}\in \mathbb{N} && \forall i \in E_{odt}, \tau \in \varGamma
+\end{align}
+
+\section{Numerical Experiments}
+We could use intercity corridor from Shanghai to Nanjing, but simplify to 10 or 12 stations. And assume a line plan with given stop pattern and corresponding frequencies.
+
+\section{Conclusion}
+
+
+%\section*{Acknowledgement}
+% This work was partially supported by the China Scholarship Council CSC (No.201309110101).
+\newpage
+
+\bibliographystyle{trb}
+\bibliography{Reference}
+
+% End line numbering
+\nolinenumbers
+\end{document}

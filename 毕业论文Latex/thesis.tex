@@ -1,0 +1,80 @@
+% 导言部分
+\documentclass[zihao = -4]{ctexbook}  % 定义文档类型是一本书，以使毕业论文可以分章节
+\usepackage[backend=biber, style=gb7714-2015]{biblatex}  % 设置参考文献样式及引用样式，TexLive中已经有GB7714-2015样式
+\usepackage[bookmarksnumbered]{hyperref}  % 添加超链接，bookmarksnumbered给书签编号
+\addbibresource{references.bib}  % 导入参考文献bib文件
+\usepackage{fontspec}  % 导入设置默认字体的宏包
+\setmainfont{Times New Roman}  % 设置默认字体为Times New Roman
+\linespread{1.4}  % 设置默认1.4倍行距
+\setlength{\parskip}{0pt}  % 设置默认段落间距为0
+\usepackage{amsmath}  % 导入数学公式宏包
+\usepackage[a4paper, twoside, left=35mm, right=25mm, top=30mm, bottom=25mm, headheight=16mm, footskip=10mm]{geometry}  % 设置页面布局，装订线10mm被算在左边距里
+\usepackage{fancyhdr} \pagestyle{fancy}  % 导入页眉页脚包，并使用fancy样式
+\fancyhf{}\fancyhead[EC]{\zihao{4}北京交通大学博士学位论文} \fancyhead[OC]{\zihao{4}\leftmark}  % 按要求更改页眉内容
+\fancyfoot[C]{\zihao{-5}\thepage}  % 在页脚处加入页码
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyhead[EC]{\zihao{4}北京交通大学博士学位论文}
+	\fancyhead[OC]{\zihao{4}\leftmark}
+	\fancyfoot[C]{\zihao{-5}\thepage}
+}  % 更改每一chapter开头使用的plain样式
+
+\ctexset{  % 设置章节格式
+	chapter/name = {,},
+	chapter/number = \arabic{chapter},  % 章序号为Arabic numbers
+	chapter/format = \centering \zihao{3} \heiti \linespread{1},
+	chapter/beforeskip = {4.8pt},  % 要求为24pt，24pt-16pt*1.2 = 4.8pt 段前间距
+	chapter/afterskip = {18pt},	 % 段后间距 18pt
+	section/format = \raggedright \zihao{-3} \heiti ,  % 左对齐，小三号，黑体
+	section/beforeskip = {6pt},  % 要求为24pt, 24pt-15pi*1.2 = 6pt
+	section/afterskip = {18pt},
+	subsection/format = \raggedright \zihao{4} \heiti ,
+	subsection/beforeskip = {7.2pt},  % 要求为24pt, 24pt-14pi*1.2 = 7.2pt
+	subsection/afterskip = {18pt}  % 段后间距
+}
+\usepackage{graphicx}  % 导入图像宏包
+\graphicspath{{figures/}}  % 图片路径
+\usepackage{float}
+
+
+% 文档部分
+\begin{document}
+	\include{kaiTou}  % 包括封面1、学位论文版本使用授权书、封面2、致谢	
+	% 前置部分
+	\frontmatter
+
+	\include{zhaiYao}  % 包括中文摘要、英文摘要
+	
+	\tableofcontents  % 生成目录	
+	\addcontentsline{toc}{chapter}{目录}  % 手动把“目录”编进目录的chapter标题
+	
+	\renewcommand{\listfigurename}{插图目录}
+	\listoffigures
+	\addcontentsline{toc}{chapter}{插图目录}
+		
+	\renewcommand{\listtablename}{表格目录}
+	\listoftables
+	\addcontentsline{toc}{chapter}{表格目录}
+	
+	\include{fuHaoBiao}  % 主要符号
+	
+	% 正文部分
+	\mainmatter	
+	\include{chapter1}  % 插入第1章内容
+	\include{chapter2}  % 插入第2章内容
+	\include{chapter3}  % 插入第3章内容
+	\include{chapter4}  % 插入第4章内容
+	
+	\printbibliography  % 在正文后打印参考文献
+	\addcontentsline{toc}{chapter}{参考文献}  % 手动将“参考文献”编进目录的chapter标题
+	
+	
+	% 附录部分
+	\appendix
+	\include{fuLu}  % 附录，包括大篇幅的代码等
+
+	
+	\backmatter
+	\include{jieWei}  % 包括研究成果，独创性声明，学位论文数据集
+	
+\end{document}
